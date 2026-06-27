@@ -70,11 +70,14 @@ func main() {
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, map[string]string{
-			"message": "SpotSync API is running 🚗",
+			"message": "SpotSync API is running",
 		})
 	})
 
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	log.Println("Server running on port", port)
 	e.Logger.Fatal(e.Start(":" + port))
 }

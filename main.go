@@ -5,6 +5,7 @@ import (
 	"os"
 	"spotsync-api/config"
 	"spotsync-api/handler"
+	appMiddleware "spotsync-api/middleware"
 	"spotsync-api/repository"
 	"spotsync-api/service"
 
@@ -20,25 +21,37 @@ func main() {
 
 	db := config.ConnectDB()
 
-	// Dependency Injection — wire করো
+	// Repositories
 	userRepo := repository.NewUserRepository(db)
+	zoneRepo := repository.NewZoneRepository(db)
+
+	// Services
 	authService := service.NewAuthService(userRepo)
+	zoneService := service.NewZoneService(zoneRepo)
+
+	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
+	zoneHandler := handler.NewZoneHandler(zoneService)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// Routes
 	api := e.Group("/api/v1")
 
-	// Auth routes (public)
+	// ✅ Public auth routes
 	auth := api.Group("/auth")
 	auth.POST("/register", authHandler.Register)
 	auth.POST("/login", authHandler.Login)
 
-	// Health check
+	// ✅ Public zone routes (GET only)
+	api.GET("/zones", zoneHandler.GetAll)
+	api.GET("/zones/:id", zoneHandler.GetByID)
+
+	// ✅ Protected zone routes (JWT + Admin)
+	api.POST("/zones", zoneHandler.Create, appMiddleware.JWTMiddleware, appMiddleware.AdminOnly)
+
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, map[string]string{
 			"message": "SpotSync API is running 🚗",

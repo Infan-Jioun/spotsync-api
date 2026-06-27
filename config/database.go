@@ -16,7 +16,6 @@ func ConnectDB() *gorm.DB {
 		log.Fatal("DB connection failed:", err)
 	}
 
-	// Auto create tables
 	err = db.AutoMigrate(
 		&models.User{},
 		&models.ParkingZone{},

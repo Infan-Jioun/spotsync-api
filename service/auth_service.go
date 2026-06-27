@@ -27,7 +27,6 @@ func NewAuthService(userRepo repository.UserRepository) AuthService {
 }
 
 func (s *authService) Register(req dto.RegisterRequest) (*dto.UserResponse, error) {
-	// Email already exists কিনা check করো
 	_, err := s.userRepo.FindByEmail(req.Email)
 	if err == nil {
 		return nil, errors.New("email already exists")
@@ -65,7 +64,7 @@ func (s *authService) Register(req dto.RegisterRequest) (*dto.UserResponse, erro
 }
 
 func (s *authService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
-	// User খোঁজো
+
 	user, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -78,7 +77,6 @@ func (s *authService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		return nil, errors.New("invalid email or password")
 	}
 
-	// JWT বানাও
 	claims := jwt.MapClaims{
 		"id":   user.ID,
 		"role": user.Role,

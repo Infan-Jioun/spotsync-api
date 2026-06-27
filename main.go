@@ -75,6 +75,6 @@ func main() {
 	})
 
 	port := os.Getenv("PORT")
-	log.Println("🚀 Server running on port", port)
+	log.Println("Server running on port", port)
 	e.Logger.Fatal(e.Start(":" + port))
 }

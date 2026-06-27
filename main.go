@@ -15,9 +15,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(".env file load failed")
-	}
+	godotenv.Load()
 
 	db := config.ConnectDB()
 
